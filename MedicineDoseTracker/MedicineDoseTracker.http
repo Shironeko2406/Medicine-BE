@@ -1,0 +1,6 @@
+@MedicineDoseTracker_HostAddress = http://localhost:5031
+
+GET {{MedicineDoseTracker_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
