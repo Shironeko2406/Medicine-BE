@@ -23,6 +23,7 @@ namespace MedicineDoseTracker.Controllers
         public async Task<ApiResponse<bool>> RegisterUser([FromBody] RegisterUserDTO registerUserDto) => await _userService.RegisterUserAsync(registerUserDto);
 
         [HttpGet("ByLogin")]
+        [SwaggerOperation(Summary = "Lấy thông tin user bằng login")]
         [Authorize()]
         public async Task<ApiResponse<UserProfileDTO>> GetUserByLoginAsync() => await _userService.GetUserByLoginAsync();
 
