@@ -69,7 +69,7 @@ namespace MedicineDoseTracker.Services
 
                 if (medicines == null || !medicines.Any())
                 {
-                    return ResponseHandler.Failure<List<MedicineDTO>>("No medicines found for the user");
+                    return ResponseHandler.Success(new List<MedicineDTO>(), "No medicines found for the user");
                 }
 
                 // Chuyển đổi từ Entity sang DTO

@@ -21,5 +21,7 @@ namespace MedicineDoseTracker.Models.DTO
 
         [Required]
         public GenderEnum Gender { get; set; } // Giới tính
+        public DateTime DateOfBirth { get; set; }
+
     }
 }
