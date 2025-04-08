@@ -25,6 +25,7 @@ namespace MedicineDoseTracker.Models.Entity
 
         [Required]
         public GenderEnum Gender { get; set; } // Giới tính
+        public DateTime DateOfBirth { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         // Navigation property
         public ICollection<Medicine> Medicines { get; set; }

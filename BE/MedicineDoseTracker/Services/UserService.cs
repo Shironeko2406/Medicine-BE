@@ -40,7 +40,8 @@ namespace MedicineDoseTracker.Services
                     Email = register.Email,
                     PasswordHash = PasswordHelper.HashPassword(register.PasswordHash),
                     Gender = register.Gender,
-                    SrcAvatar = register.SrcAvatar
+                    SrcAvatar = register.SrcAvatar,
+                    DateOfBirth = register.DateOfBirth,
                 };
 
                 // Thêm người dùng mới vào cơ sở dữ liệu

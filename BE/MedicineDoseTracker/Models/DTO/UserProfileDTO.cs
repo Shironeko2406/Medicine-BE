@@ -10,5 +10,7 @@ namespace MedicineDoseTracker.Models.DTO
         public string Email { get; set; }
         public string? SrcAvatar { get; set; } // Đường dẫn ảnh đại diện
         public GenderEnum Gender { get; set; } // Giới tính
+        public DateTime DateOfBirth { get; set; }
+
     }
 }
