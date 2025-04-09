@@ -24,5 +24,16 @@ namespace MedicineDoseTracker.Handler
 
             };
         }
+
+        public static ApiResponse<T> LogicFailure<T>(string message)
+        {
+            return new ApiResponse<T>
+            {
+                Data = default(T),
+                isSuccess = true,
+                Message = message
+            };
+        }
+
     }
 }

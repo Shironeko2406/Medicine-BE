@@ -20,7 +20,7 @@ namespace MedicineDoseTracker.Models.DTO
         public string? SrcAvatar { get; set; } // Đường dẫn ảnh đại diện
 
         [Required]
-        public GenderEnum Gender { get; set; } // Giới tính
+        public GenderEnum Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
 
     }

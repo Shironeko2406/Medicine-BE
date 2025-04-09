@@ -27,14 +27,14 @@ namespace MedicineDoseTracker.Services
                 var user = await _unitOfWork.UserRepository.GetUserByUserName(loginRequestDTO.Username);
                 if (user == null)
                 {
-                    return ResponseHandler.Failure<LoginResponseDTO>("Invalid username or password.");
+                    return ResponseHandler.LogicFailure<LoginResponseDTO>("Invalid username or password.");
                 }
 
                 // Compare the password hash
                 if (!PasswordHelper.VerifyPassword(loginRequestDTO.Password, user.PasswordHash))
                 {
                     // If password is incorrect
-                    return ResponseHandler.Failure<LoginResponseDTO>("Invalid username or password.");
+                    return ResponseHandler.LogicFailure<LoginResponseDTO>("Invalid username or password.");
                 }
 
                 // Generate JWT token

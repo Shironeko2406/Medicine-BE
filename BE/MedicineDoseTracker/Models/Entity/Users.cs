@@ -10,24 +10,18 @@ namespace MedicineDoseTracker.Models.Entity
         [Key]
         public Guid UserId { get; set; }
         public string UserName { get; set; }
-
         [Required, MaxLength(100)]
         public string FullName { get; set; }
-
         [Required, EmailAddress, MaxLength(255)]
         public string Email { get; set; }
-
         [Required]
-        public string PasswordHash { get; set; } // Lưu mật khẩu đã hash
-
+        public string PasswordHash { get; set; } 
         [MaxLength(500)]
-        public string? SrcAvatar { get; set; } // Đường dẫn ảnh đại diện
-
+        public string? SrcAvatar { get; set; } 
         [Required]
-        public GenderEnum Gender { get; set; } // Giới tính
+        public GenderEnum Gender { get; set; } 
         public DateTime DateOfBirth { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        // Navigation property
         public ICollection<Medicine> Medicines { get; set; }
     }
 }
