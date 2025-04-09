@@ -11,6 +11,7 @@ namespace MedicineDoseTracker.Mappers
             #region Medicine
             CreateMap<Medicine, MedicineDTO>();
             CreateMap<UpdateMedicineDTO, Medicine>();
+            CreateMap<CreateMedicineDTO, Medicine>();
             #endregion
 
             #region Users

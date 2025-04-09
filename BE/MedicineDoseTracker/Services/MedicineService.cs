@@ -34,13 +34,7 @@ namespace MedicineDoseTracker.Services
                 }
 
                 // Tạo đối tượng Medicine mới
-                var medicine = new Medicine
-                {
-                    UserId = createMedicineDTO.UserId,
-                    Name = createMedicineDTO.Name,
-                    Dosage = createMedicineDTO.Dosage,
-                    Frequency = createMedicineDTO.Frequency,
-                };
+                var medicine = _mapper.Map<Medicine>(createMedicineDTO);
 
                 // Thêm vào database
                 await _unitOfWork.MedicineRepository.AddAsync(medicine);
