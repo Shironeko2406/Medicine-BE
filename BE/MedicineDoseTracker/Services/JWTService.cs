@@ -3,6 +3,7 @@ using MedicineDoseTracker.Models.Entity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MedicineDoseTracker.Services
@@ -24,11 +25,14 @@ namespace MedicineDoseTracker.Services
 
             var claims = new[]
             {
-                new Claim("UserId", user.UserId.ToString()), // UserId làm Claim
-                new Claim("UserName", user.UserName), // UserName làm Claim
-                new Claim("Email", user.Email), // Email làm Claim
-                new Claim("Gender", user.Gender.ToString()), // Gender làm Claim
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Thêm JTI cho Token
+                new Claim("UserId", user.UserId.ToString()), 
+                new Claim("UserName", user.UserName), 
+                new Claim("FullName", user.FullName), 
+                new Claim("Email", user.Email), 
+                new Claim("SrcAvatar", user.SrcAvatar ?? ""), 
+                new Claim("Gender", user.Gender.ToString()), 
+                new Claim("DateOfBirth", user.DateOfBirth.ToString("yyyy-MM-dd")),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) 
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -43,6 +47,14 @@ namespace MedicineDoseTracker.Services
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var random = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(random);
+            return Convert.ToBase64String(random);
         }
     }
 }
