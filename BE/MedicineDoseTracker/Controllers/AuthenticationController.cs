@@ -24,5 +24,12 @@ namespace MedicineDoseTracker.Controllers
         {
             return await _authenticationService.LoginAsync(loginRequestDTO);
         }
+
+        [SwaggerOperation(Summary = "Làm mới Access Token từ Refresh Token")]
+        [HttpPut("refresh-token")]
+        public async Task<ApiResponse<LoginResponseDTO>> RefreshToken(RefreshTokenRequestDTO request)
+        {
+            return await _authenticationService.RefreshTokenAsync(request);
+        }
     }
 }

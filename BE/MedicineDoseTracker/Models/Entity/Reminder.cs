@@ -8,12 +8,9 @@ namespace MedicineDoseTracker.Models.Entity
         [Key]
         public Guid ReminderId { get; set; }
         [Required]
-        public Guid MedicineId { get; set; } 
+        public Guid MedicineId { get; set; }
         [Required]
         public DateTime ReminderTime { get; set; } 
-        [Required, MaxLength(50)]
-        public string NotificationType { get; set; } 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         // Navigation property
         [ForeignKey("MedicineId")]
         public Medicine Medicine { get; set; }

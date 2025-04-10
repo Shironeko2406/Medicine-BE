@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using MedicineDoseTracker.Commons;
 using MedicineDoseTracker.Handler;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace MedicineDoseTracker.Services
 {
@@ -20,11 +22,13 @@ namespace MedicineDoseTracker.Services
         private readonly IEmailService _emailService;
         private readonly IClaimsService _claimsService;
         private readonly IMapper _mapper;
-        public UserService(IUnitOfWork unitOfWork, IEmailService emailService, IClaimsService claimsService, IMapper mapper) { 
+        private readonly IValidator<RegisterUserDTO> _validator;
+        public UserService(IUnitOfWork unitOfWork, IEmailService emailService, IClaimsService claimsService, IMapper mapper, IValidator<RegisterUserDTO> validator) { 
             _unitOfWork = unitOfWork;
             _emailService = emailService;
             _claimsService = claimsService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         public async Task<ApiResponse<bool>> RegisterUserAsync(RegisterUserDTO register)
@@ -32,6 +36,13 @@ namespace MedicineDoseTracker.Services
             var response = new ApiResponse<bool>();
             try
             {
+                // ✅ Validate dữ liệu
+                ValidationResult validationResult = await _validator.ValidateAsync(register);
+                if (!validationResult.IsValid)
+                {
+                    var errors = string.Join(" & ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    return ResponseHandler.Failure<bool>(errors);
+                }
                 // Tạo người dùng mới từ thông tin đăng ký
                 var userCreate = new Users
                 {
@@ -56,7 +67,7 @@ namespace MedicineDoseTracker.Services
                     Body = $"Xin chào {register.FullName},<br><br>Cảm ơn bạn đã đăng ký. Chúc bạn một ngày tốt lành!<br><br>Trân trọng,<br>Medicine Dose Tracker Team"
                 };
 
-                //await _emailService.SendEmailRegisterUserAsync(emailMessage);
+                await _emailService.SendEmailRegisterUserAsync(emailMessage);
 
                 // Trả về kết quả thành công với thông tin người dùng đã đăng ký
                 response = ResponseHandler.Success(true, "Đăng ký thành công!");

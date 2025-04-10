@@ -25,6 +25,12 @@ const getDataTextStorage = (storeName) => {
   const removeDataTextStorage = (storeName) => {
     localStorage.removeItem(storeName);
   };
+
+  const logout = () =>{
+    localStorage.clear()
+    window.location.href = '/';
+  }
+  
   
   function setCookie(name, value, days) {
     let expires = "";
@@ -61,5 +67,6 @@ const getDataTextStorage = (storeName) => {
     setCookie,
     getCookie,
     deleteCookie,
+    logout
   };
   

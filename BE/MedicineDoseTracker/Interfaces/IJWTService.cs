@@ -1,4 +1,5 @@
 ﻿using MedicineDoseTracker.Models.Entity;
+using System.Security.Claims;
 
 namespace MedicineDoseTracker.Interfaces
 {
@@ -6,6 +7,7 @@ namespace MedicineDoseTracker.Interfaces
     {
         public string GenerateJWT(Users user);
         public string GenerateRefreshToken();
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 
     }
 }

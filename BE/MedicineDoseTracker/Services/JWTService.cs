@@ -11,10 +11,13 @@ namespace MedicineDoseTracker.Services
     public class JWTService : IJWTService
     {
         private readonly IConfiguration _configuration;
+        private readonly ICurrentTimeService _currentTimeService;
 
-        public JWTService(IConfiguration configuration)
+
+        public JWTService(IConfiguration configuration, ICurrentTimeService currentTimeService)
         {
             _configuration = configuration;
+            _currentTimeService = currentTimeService;
         }
         public string GenerateJWT(Users user)
         {
@@ -42,7 +45,7 @@ namespace MedicineDoseTracker.Services
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddSeconds(10),
                 signingCredentials: creds
             );
 
@@ -55,6 +58,34 @@ namespace MedicineDoseTracker.Services
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(random);
             return Convert.ToBase64String(random);
+        }
+
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = false, // 👈 Bỏ qua kiểm tra hết hạn
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtToken &&
+                jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return principal;
+            }
+
+            return null;
         }
     }
 }

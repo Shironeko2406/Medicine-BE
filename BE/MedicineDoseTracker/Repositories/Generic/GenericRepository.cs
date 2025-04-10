@@ -62,5 +62,10 @@ namespace MedicineDoseTracker.Repositories.Generic
                 throw new InvalidOperationException($"Entity {typeof(TEntity).Name} does not contain a 'IsDeleted' property.");
             }
         }
+
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
     }
 }

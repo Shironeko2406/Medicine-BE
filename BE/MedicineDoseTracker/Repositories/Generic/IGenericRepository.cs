@@ -11,5 +11,6 @@ namespace MedicineDoseTracker.Repositories.Generic
         Task UpdateAsync(TEntity entity);
         Task DeleteAsync(Guid id);
         void SoftDelete(TEntity entity);
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }
