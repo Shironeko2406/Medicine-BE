@@ -62,7 +62,7 @@ medicine-dose-tracker/
 ### 1️⃣ Clone dự án
 
 ```bash
-git clone https://github.com/your-username/medicine-dose-tracker.git
+git clone https://github.com/Shironeko2406/MedicineSystem.git
 cd medicine-dose-tracker
 ```
 
