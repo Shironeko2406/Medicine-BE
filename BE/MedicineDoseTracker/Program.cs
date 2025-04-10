@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MedicineDoseTracker;
 using MedicineDoseTracker.Interfaces;
+using MedicineDoseTracker.Jobs;
 using MedicineDoseTracker.Mappers;
 using MedicineDoseTracker.Models.DTO;
 using MedicineDoseTracker.Repositories.Generic;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,7 +74,24 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddQuartz(q =>
+{
+    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+    var currentTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
 
+    q.UseMicrosoftDependencyInjectionJobFactory();
+    var jobKey = new JobKey("ReminderEmailJob");
+    q.AddJob<ReminderEmailJob>(opts => opts.WithIdentity(jobKey));
+    q.AddTrigger(opts => opts
+        .ForJob(jobKey)
+        .WithIdentity("ReminderEmailJob-trigger")
+        .WithSchedule(
+            CronScheduleBuilder
+                .DailyAtHourAndMinute(7, 0)
+                .InTimeZone(vietnamTimeZone)
+        )
+    );
+});
 
 //Đăng ký DI
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -81,9 +100,6 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
 builder.Services.AddScoped<IUserLoginRepository, UserLoginRepository>();
 builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
-
-
-
 
 //Đăng ký service
 builder.Services.AddScoped<IUserService, UserService>();
@@ -95,16 +111,15 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
 
-
 //Validator
 builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterUserDTOValidator>();
-
 
 
 //-------------------------------------------------------------------
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -121,6 +136,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
 
 var app = builder.Build();
 

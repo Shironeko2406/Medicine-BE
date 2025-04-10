@@ -20,5 +20,13 @@ namespace MedicineDoseTracker.Repositories.User
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
             return user;
         }
+
+        public async Task<List<Users>> GetUsersWithMedicinesAsync()
+        {
+            return await _dbContext.Users
+                    .Where(u => u.Medicines.Any(m => !m.IsDeleted))
+                    .Include(u => u.Medicines)
+                    .ToListAsync();
+        }
     }
 }

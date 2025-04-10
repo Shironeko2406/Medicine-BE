@@ -6,5 +6,7 @@ namespace MedicineDoseTracker.Repositories.UserRepo
     public interface IUserRepository : IGenericRepository<Users>
     {
         Task<Users> GetUserByUserName(string username);
+        Task<List<Users>> GetUsersWithMedicinesAsync();
+
     }
 }

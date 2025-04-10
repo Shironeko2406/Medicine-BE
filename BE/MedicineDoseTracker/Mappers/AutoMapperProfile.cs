@@ -16,6 +16,10 @@ namespace MedicineDoseTracker.Mappers
 
             #region Users
             CreateMap<Users, UserProfileDTO>();
+            CreateMap<Users, UserMedicineInfoDTO>()
+                .ForMember(dest => dest.Medicines,
+                           opt => opt.MapFrom(src => src.Medicines.Where(m => !m.IsDeleted)));
+
             #endregion
         }
     }

@@ -29,5 +29,16 @@ namespace MedicineDoseTracker.Controllers
         [Authorize()]
         public async Task<ApiResponse<UserProfileDTO>> GetUserByLoginAsync() => await _userService.GetUserByLoginAsync();
 
+        [HttpGet("user-medicine")]
+        public async Task<ActionResult<List<UserMedicineInfoDTO>>> GetUserMedicineList()
+        {
+            var result = await _reminderService.GetUserMedicinesForEmailAsync();
+
+            if (result == null || result.Count == 0)
+                return NoContent();
+
+            return Ok(result);
+        }
+
     }
 }
