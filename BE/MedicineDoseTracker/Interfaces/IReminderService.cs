@@ -1,7 +1,10 @@
-﻿namespace MedicineDoseTracker.Interfaces
+﻿using MedicineDoseTracker.Models.DTO;
+
+namespace MedicineDoseTracker.Interfaces
 {
     public interface IReminderService
     {
-        Task SendReminderEmailsAsync();
+        Task<List<UserMedicineInfoDTO>> GetUserMedicinesForEmailAsync();
+
     }
 }

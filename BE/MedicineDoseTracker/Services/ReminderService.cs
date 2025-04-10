@@ -1,6 +1,8 @@
-﻿using MedicineDoseTracker.Interfaces;
+﻿using AutoMapper;
+using MedicineDoseTracker.Interfaces;
 using MedicineDoseTracker.Models.DTO;
 using MedicineDoseTracker.Repositories.ReminderRepo;
+using MedicineDoseTracker.Repositories.UnitOfWork;
 
 namespace MedicineDoseTracker.Services
 {
@@ -8,28 +10,33 @@ namespace MedicineDoseTracker.Services
     {
         private readonly IReminderRepository _reminderRepository;
         private readonly IEmailService _emailService;
-        public ReminderService(IReminderRepository reminderRepository, IEmailService emailService)
+        private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
+
+
+        public ReminderService(IReminderRepository reminderRepository, IEmailService emailService, IMapper mapper, IUnitOfWork unitOfWork)
         { 
             _reminderRepository = reminderRepository;
             _emailService = emailService;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
-        public async Task SendReminderEmailsAsync()
+
+        public async Task<List<UserMedicineInfoDTO>> GetUserMedicinesForEmailAsync()
         {
-            var reminders = await _reminderRepository.GetRemindersToSendAsync();
+            var users = await _unitOfWork.UserRepository.GetUsersWithMedicinesAsync();
 
-            foreach (var reminder in reminders)
+            var result = users.Select(user => new UserMedicineInfoDTO
             {
-                var user = reminder.Medicine.User;
+                Email = user.Email,
+                UserName = user.UserName,
+                Medicines = user.Medicines
+                    .Where(m => !m.IsDeleted)
+                    .Select(m => _mapper.Map<MedicineDTO>(m))
+                    .ToList()
+            }).ToList();
 
-                var email = new MessageEmailDTO
-                {
-                    To = user.Email,
-                    Subject = "⏰ Nhắc nhở uống thuốc",
-                    Body = $"Xin chào {user.FullName},<br>Bạn cần uống thuốc <b>{reminder.Medicine.Name}</b> theo liều <b>{reminder.Medicine.Dosage}</b> lúc {reminder.ReminderTime:HH:mm dd/MM/yyyy}."
-                };
-
-                await _emailService.SendEmailRegisterUserAsync(email);
-            }
+            return result;
         }
     }
 }
