@@ -3,6 +3,7 @@ using MedicineDoseTracker.Models.Entity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace MedicineDoseTracker.Services
@@ -10,10 +11,13 @@ namespace MedicineDoseTracker.Services
     public class JWTService : IJWTService
     {
         private readonly IConfiguration _configuration;
+        private readonly ICurrentTimeService _currentTimeService;
 
-        public JWTService(IConfiguration configuration)
+
+        public JWTService(IConfiguration configuration, ICurrentTimeService currentTimeService)
         {
             _configuration = configuration;
+            _currentTimeService = currentTimeService;
         }
         public string GenerateJWT(Users user)
         {
@@ -24,11 +28,14 @@ namespace MedicineDoseTracker.Services
 
             var claims = new[]
             {
-                new Claim("UserId", user.UserId.ToString()), // UserId làm Claim
-                new Claim("UserName", user.UserName), // UserName làm Claim
-                new Claim("Email", user.Email), // Email làm Claim
-                new Claim("Gender", user.Gender.ToString()), // Gender làm Claim
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Thêm JTI cho Token
+                new Claim("UserId", user.UserId.ToString()), 
+                new Claim("UserName", user.UserName), 
+                new Claim("FullName", user.FullName), 
+                new Claim("Email", user.Email), 
+                new Claim("SrcAvatar", user.SrcAvatar ?? ""), 
+                new Claim("Gender", user.Gender.ToString()), 
+                new Claim("DateOfBirth", user.DateOfBirth.ToString("yyyy-MM-dd")),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) 
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
@@ -38,11 +45,47 @@ namespace MedicineDoseTracker.Services
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddSeconds(10),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var random = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(random);
+            return Convert.ToBase64String(random);
+        }
+
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidateLifetime = false, // 👈 Bỏ qua kiểm tra hết hạn
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidAudience = jwtSettings["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtToken &&
+                jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return principal;
+            }
+
+            return null;
         }
     }
 }

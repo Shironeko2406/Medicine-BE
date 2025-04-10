@@ -12,5 +12,6 @@ namespace MedicineDoseTracker
         public DbSet<Users> Users { get; set; }
         public DbSet<Medicine> Medicines { get; set; }
         public DbSet<Reminder> Reminders { get; set; }
+        public DbSet<UserLogin> UserLogins { get; set; }
     }
 }

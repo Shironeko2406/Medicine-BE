@@ -13,9 +13,11 @@ namespace MedicineDoseTracker.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService) 
+        private readonly IReminderService _reminderService;
+        public UserController(IUserService userService, IReminderService reminderService) 
         { 
             _userService = userService;
+            _reminderService = reminderService;
         }
 
         [SwaggerOperation(Summary = "Tạo mới người dùng")]

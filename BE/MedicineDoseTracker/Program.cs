@@ -1,12 +1,17 @@
-﻿using MedicineDoseTracker;
+﻿using FluentValidation;
+using MedicineDoseTracker;
 using MedicineDoseTracker.Interfaces;
 using MedicineDoseTracker.Mappers;
+using MedicineDoseTracker.Models.DTO;
 using MedicineDoseTracker.Repositories.Generic;
 using MedicineDoseTracker.Repositories.MedicineRepo;
+using MedicineDoseTracker.Repositories.ReminderRepo;
 using MedicineDoseTracker.Repositories.UnitOfWork;
 using MedicineDoseTracker.Repositories.User;
+using MedicineDoseTracker.Repositories.UserLoginRepo;
 using MedicineDoseTracker.Repositories.UserRepo;
 using MedicineDoseTracker.Services;
+using MedicineDoseTracker.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -74,16 +79,26 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMedicineRepository, MedicineRepository>();
+builder.Services.AddScoped<IUserLoginRepository, UserLoginRepository>();
+builder.Services.AddScoped<IReminderRepository, ReminderRepository>();
+
+
 
 
 //Đăng ký service
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMedicineService, MedicineService>();
+builder.Services.AddScoped<IReminderService, ReminderService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ICurrentTimeService, CurrentTimeService>();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IClaimsService, ClaimsService>();
+
+
+//Validator
+builder.Services.AddScoped<IValidator<RegisterUserDTO>, RegisterUserDTOValidator>();
+
 
 
 //-------------------------------------------------------------------

@@ -5,10 +5,10 @@ import {
   setDataTextStorage,
 } from "../../Utils/UltilFunction";
 import { jwtDecode } from "jwt-decode";
-import { httpClient, TOKEN_AUTHOR, USER_LOGIN } from "../../Utils/Interceptor";
+import { httpClient, REFRESH_TOKEN, TOKEN_AUTHOR, USER_LOGIN } from "../../Utils/Interceptor";
 
 const initialState = {
-  userLogin: getDataJSONStorage(USER_LOGIN),
+  userLogin: getDataJSONStorage("userLogin"),
 };
 
 const AuthenticationReducer = createSlice({
@@ -35,6 +35,7 @@ export const LoginActionAsync = (dataLogin) => {
         dispatch(setUserLogin(user));
         setDataJSONStorage(USER_LOGIN, user);
         setDataTextStorage(TOKEN_AUTHOR, res.data.accessToken);
+        setDataTextStorage(REFRESH_TOKEN, res.data.refreshToken);
         return { success: true, data: user, message: res.message }; // ✅ Thành công thực sự
       } else if (res.isSuccess && !res.data) {
         return { success: false, data: null, message: res.message }; // ✅ Lỗi logic (sai tài khoản)
@@ -44,6 +45,27 @@ export const LoginActionAsync = (dataLogin) => {
     } catch (error) {
       console.error(error);
       return { success: false, message: "System error" }; // ❌ Lỗi hệ thống
+    }
+  };
+};
+
+export const RefreshTokenActionAsync = (refreshToken, accessToken) => {
+  return async (dispatch) => {
+    try {
+
+      const res = await httpClient.put(`/api/Authentication/refresh-token`, { accessToken: accessToken, refreshToken: refreshToken });
+      if (res.isSuccess && res.data) {
+        setDataTextStorage(TOKEN_AUTHOR, res.data.accessToken);
+        setDataTextStorage(REFRESH_TOKEN, res.data.refreshToken);
+        return true;
+      } else if (res.isSuccess && !res.data) {
+        return false;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   };
 };

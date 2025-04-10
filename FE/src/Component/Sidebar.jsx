@@ -1,5 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { getDataJSONStorage } from '../Utils/UltilFunction';
+import { USER_LOGIN } from '../Utils/Interceptor';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => (
   <>
@@ -27,12 +29,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => (
           <div className="flex items-center space-x-3">
             <img
               className="h-10 w-10 rounded-full"
-              src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
+              src={getDataJSONStorage(USER_LOGIN)?.SrcAvatar || '/user.jpg'}
               alt="User avatar"
             />
             <div>
-              <p className="text-sm font-medium">Tom Cook</p>
-              <p className="text-xs text-gray-400">tom@example.com</p>
+              <p className="text-sm font-medium">{getDataJSONStorage(USER_LOGIN).FullName}</p>
+              <p className="text-xs text-gray-400">{getDataJSONStorage(USER_LOGIN).Email}</p>
             </div>
           </div>
         </div>
@@ -57,12 +59,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => (
         <div className="flex items-center space-x-3">
           <img
             className="h-10 w-10 rounded-full"
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
+            src={getDataJSONStorage(USER_LOGIN)?.SrcAvatar || '/user.jpg'}
             alt="User avatar"
           />
           <div>
-            <p className="text-sm font-medium">Tom Cook</p>
-            <p className="text-xs text-gray-400">tom@example.com</p>
+            <p className="text-sm font-medium">{getDataJSONStorage(USER_LOGIN).FullName}</p>
+            <p className="text-xs text-gray-400">{getDataJSONStorage(USER_LOGIN).Email}</p>
           </div>
         </div>
       </div>

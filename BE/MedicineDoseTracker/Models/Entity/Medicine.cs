@@ -15,9 +15,9 @@ namespace MedicineDoseTracker.Models.Entity
         public string Dosage { get; set; }
         [Required, MaxLength(255)]
         public string Frequency { get; set; }
-        [MaxLength(500)] // <-- Thêm trường ảnh ở đây
+        [MaxLength(500)] 
         public string? SrcImg { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
         // Navigation property
         [ForeignKey("UserId")]
